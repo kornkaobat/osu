@@ -28,5 +28,7 @@ namespace osu.Game.IO.Archives
         }
 
         public override IEnumerable<string> Filenames => new[] { Name };
+
+        public override Stream GetUnderlyingStream() => null;
     }
 }

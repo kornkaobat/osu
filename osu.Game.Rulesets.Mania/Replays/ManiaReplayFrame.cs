@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -25,9 +24,15 @@ namespace osu.Game.Rulesets.Mania.Replays
             Actions.AddRange(actions);
         }
 
-        public void FromLegacy(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
-            var maniaBeatmap = (ManiaBeatmap)beatmap;
+            // We don't need to fully convert, just create the converter
+            var converter = new ManiaBeatmapConverter(beatmap, new ManiaRuleset());
+
+            // NB: Via co-op mod, osu-stable can have two stages with floor(col/2) and ceil(col/2) columns. This will need special handling
+            // elsewhere in the game if we do choose to support the old co-op mod anyway. For now, assume that there is only one stage.
+
+            var stage = new StageDefinition { Columns = converter.TargetColumns };
 
             var normalAction = ManiaAction.Key1;
             var specialAction = ManiaAction.Special1;
@@ -37,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
             while (activeColumns > 0)
             {
-                var isSpecial = maniaBeatmap.Stages.First().IsSpecialColumn(counter);
+                var isSpecial = stage.IsSpecialColumn(counter);
 
                 if ((activeColumns & 1) > 0)
                     Actions.Add(isSpecial ? specialAction : normalAction);
@@ -50,41 +55,6 @@ namespace osu.Game.Rulesets.Mania.Replays
                 counter++;
                 activeColumns >>= 1;
             }
-        }
-
-        public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
-        {
-            var maniaBeatmap = (ManiaBeatmap)beatmap;
-
-            int keys = 0;
-
-            var specialColumns = new List<int>();
-
-            for (int i = 0; i < maniaBeatmap.TotalColumns; i++)
-            {
-                if (maniaBeatmap.Stages.First().IsSpecialColumn(i))
-                    specialColumns.Add(i);
-            }
-
-            foreach (var action in Actions)
-            {
-                switch (action)
-                {
-                    case ManiaAction.Special1:
-                        keys |= 1 << specialColumns[0];
-                        break;
-
-                    case ManiaAction.Special2:
-                        keys |= 1 << specialColumns[1];
-                        break;
-
-                    default:
-                        keys |= 1 << (action - ManiaAction.Key1);
-                        break;
-                }
-            }
-
-            return new LegacyReplayFrame(Time, keys, null, ReplayButtonState.None);
         }
     }
 }

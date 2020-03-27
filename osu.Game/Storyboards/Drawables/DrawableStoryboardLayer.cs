@@ -21,8 +21,7 @@ namespace osu.Game.Storyboards.Drawables
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Enabled = layer.VisibleWhenPassing;
-            Masking = layer.Masking;
+            Enabled = layer.EnabledWhenPassing;
         }
 
         [BackgroundDependencyLoader]

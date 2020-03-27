@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             pathVersion.BindValueChanged(_ => Position = slider.EndPosition);
         }
 
-        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
-        public override Judgement CreateJudgement() => new SliderRepeat.SliderRepeatJudgement();
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

@@ -33,24 +33,22 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
-        private SpriteText labelText;
+        private SpriteText text;
 
         public bool ShowsDefaultIndicator = true;
 
         public virtual string LabelText
         {
-            get => labelText?.Text ?? string.Empty;
+            get => text?.Text ?? string.Empty;
             set
             {
-                if (labelText == null)
+                if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
-
-                    updateDisabled();
+                    FlowContent.Insert(-1, text = new OsuSpriteText());
                 }
 
-                labelText.Text = value;
+                text.Text = value;
             }
         }
 
@@ -98,17 +96,11 @@ namespace osu.Game.Overlays.Settings
             if (controlWithCurrent != null)
             {
                 controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
-                controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
+                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
 
                 if (ShowsDefaultIndicator)
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
-        }
-
-        private void updateDisabled()
-        {
-            if (labelText != null)
-                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
         private class RestoreDefaultValueButton : Container, IHasTooltip

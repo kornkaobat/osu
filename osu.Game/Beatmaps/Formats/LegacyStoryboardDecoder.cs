@@ -4,13 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Framework.Graphics;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.IO;
-using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Graphics;
+using osu.Game.IO;
+using osu.Game.Storyboards;
+using osu.Game.Beatmaps.Legacy;
+using osu.Framework.Utils;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -87,15 +87,6 @@ namespace osu.Game.Beatmaps.Formats
 
                 switch (type)
                 {
-                    case LegacyEventType.Video:
-                    {
-                        var offset = Parsing.ParseInt(split[1]);
-                        var path = CleanFilename(split[2]);
-
-                        storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
-                        break;
-                    }
-
                     case LegacyEventType.Sprite:
                     {
                         var layer = parseLayer(split[1]);

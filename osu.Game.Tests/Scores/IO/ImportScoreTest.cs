@@ -236,6 +236,8 @@ namespace osu.Game.Tests.Scores.IO
             }
 
             public override IEnumerable<string> Filenames => new[] { "test_file.osr" };
+
+            public override Stream GetUnderlyingStream() => new MemoryStream();
         }
     }
 }

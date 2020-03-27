@@ -227,34 +227,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count);
         }
 
-        [Test]
-        public void TestSelectionEnteringFromEmptyRuleset()
-        {
-            var sets = new List<BeatmapSetInfo>();
-
-            AddStep("Create beatmaps for taiko only", () =>
-            {
-                sets.Clear();
-
-                var rulesetBeatmapSet = createTestBeatmapSet(1);
-                var taikoRuleset = rulesets.AvailableRulesets.ElementAt(1);
-                rulesetBeatmapSet.Beatmaps.ForEach(b =>
-                {
-                    b.Ruleset = taikoRuleset;
-                    b.RulesetID = 1;
-                });
-
-                sets.Add(rulesetBeatmapSet);
-            });
-
-            loadBeatmaps(sets, () => new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) });
-
-            AddStep("Set non-empty mode filter", () =>
-                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1) }, false));
-
-            AddAssert("Something is selected", () => carousel.SelectedBeatmap != null);
-        }
-
         /// <summary>
         /// Test sorting
         /// </summary>
@@ -427,32 +399,27 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap.RulesetID == 0);
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap == null);
 
             AddStep("remove mixed set", () =>
             {
                 carousel.RemoveBeatmapSet(testMixed);
                 testMixed = null;
             });
-            BeatmapSetInfo testSingle = null;
-            AddStep("add single ruleset beatmapset", () =>
+            var testSingle = createTestBeatmapSet(set_count + 2);
+            testSingle.Beatmaps.ForEach(b =>
             {
-                testSingle = createTestBeatmapSet(set_count + 2);
-                testSingle.Beatmaps.ForEach(b =>
-                {
-                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
-                    b.RulesetID = b.Ruleset.ID ?? 1;
-                });
-
-                carousel.UpdateBeatmapSet(testSingle);
+                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
+                b.RulesetID = b.Ruleset.ID ?? 1;
             });
+            AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
             checkNoSelection();
             AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
         }
 
         [Test]
-        public void TestCarouselRemembersSelection()
+        public void TestCarouselRootIsRandom()
         {
             List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
 
@@ -462,74 +429,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(manySets);
 
             advanceSelection(direction: 1, diff: false);
-
-            for (int i = 0; i < 5; i++)
-            {
-                AddStep("Toggle non-matching filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
-                });
-
-                AddStep("Restore no filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria(), false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-                });
-            }
-
-            // always returns to same selection as long as it's available.
-            AddAssert("Selection was remembered", () => eagerSelectedIDs.Count == 1);
-        }
-
-        [Test]
-        public void TestRandomFallbackOnNonMatchingPrevious()
-        {
-            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
-
-            AddStep("populate maps", () =>
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    var set = createTestBeatmapSet(i);
-
-                    foreach (var b in set.Beatmaps)
-                    {
-                        // all taiko except for first
-                        int ruleset = i > 0 ? 1 : 0;
-
-                        b.Ruleset = rulesets.GetRuleset(ruleset);
-                        b.RulesetID = ruleset;
-                    }
-
-                    manySets.Add(set);
-                }
-            });
-
-            loadBeatmaps(manySets);
-
-            for (int i = 0; i < 10; i++)
-            {
-                AddStep("Reset filter", () => carousel.Filter(new FilterCriteria(), false));
-
-                AddStep("select first beatmap", () => carousel.SelectBeatmap(manySets.First().Beatmaps.First()));
-
-                AddStep("Toggle non-matching filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
-                });
-
-                AddAssert("selection lost", () => carousel.SelectedBeatmap == null);
-
-                AddStep("Restore different ruleset filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-                });
-
-                AddAssert("selection changed", () => carousel.SelectedBeatmap != manySets.First().Beatmaps.First());
-            }
-
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
 
         [Test]
@@ -579,7 +484,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
         {
             createCarousel();
 
@@ -594,7 +499,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             bool changed = false;
             AddStep($"Load {(beatmapSets.Count > 0 ? beatmapSets.Count.ToString() : "some")} beatmaps", () =>
             {
-                carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
+                carousel.Filter(new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
                 carousel.BeatmapSets = beatmapSets;
             });
@@ -686,6 +591,16 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             nextRandom();
             AddAssert("Selection is visible", selectedBeatmapVisible);
+        }
+
+        private void checkNonmatchingFilter()
+        {
+            AddStep("Toggle non-matching filter", () =>
+            {
+                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
+                carousel.Filter(new FilterCriteria(), false);
+                eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+            });
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int id)

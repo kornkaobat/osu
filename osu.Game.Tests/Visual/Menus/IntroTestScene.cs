@@ -64,8 +64,6 @@ namespace osu.Game.Tests.Visual.Menus
 
                 introStack.Push(CreateScreen());
             });
-
-            AddUntilStep("wait for menu", () => introStack.CurrentScreen is MainMenu);
         }
 
         protected abstract IScreen CreateScreen();

@@ -44,6 +44,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             drawableStoryboard = storyboard.CreateDrawable();
+            drawableStoryboard.Masking = true;
 
             if (async)
                 LoadComponentAsync(drawableStoryboard, Add);

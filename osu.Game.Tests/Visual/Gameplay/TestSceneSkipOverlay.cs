@@ -14,7 +14,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSkipOverlay : OsuManualInputManagerTestScene
+    public class TestSceneSkipOverlay : ManualInputManagerTestScene
     {
         private SkipOverlay skip;
         private int requestCount;

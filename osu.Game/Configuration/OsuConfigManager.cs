@@ -70,6 +70,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.ShowVideoBackground, true);
             Set(OsuSetting.BeatmapSkins, true);
             Set(OsuSetting.BeatmapHitsounds, true);
 
@@ -175,6 +176,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         LightenDuringBreaks,
         ShowStoryboard,
+        ShowVideoBackground,
         KeyOverlay,
         ScoreMeter,
         FloatingComments,

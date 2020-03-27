@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
@@ -13,16 +12,14 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneBreakTracker : OsuTestScene
+    public class TestSceneBreakOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(BreakOverlay),
         };
 
-        private readonly BreakOverlay breakOverlay;
-
-        private readonly TestBreakTracker breakTracker;
+        private readonly TestBreakOverlay breakOverlay;
 
         private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
         {
@@ -38,23 +35,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             },
         };
 
-        public TestSceneBreakTracker()
+        public TestSceneBreakOverlay()
         {
-            AddRange(new Drawable[]
-            {
-                breakTracker = new TestBreakTracker(),
-                breakOverlay = new BreakOverlay(true)
-                {
-                    ProcessCustomClock = false,
-                }
-            });
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            breakOverlay.Clock = breakTracker.Clock;
+            Add(breakOverlay = new TestBreakOverlay(true));
         }
 
         [Test]
@@ -105,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadBreaksStep("multiple breaks", testBreaks);
 
             seekAndAssertBreak("seek to break start", testBreaks[1].StartTime, true);
-            AddAssert("is skipped to break #2", () => breakTracker.CurrentBreakIndex == 1);
+            AddAssert("is skipped to break #2", () => breakOverlay.CurrentBreakIndex == 1);
 
             seekAndAssertBreak("seek to break middle", testBreaks[1].StartTime + testBreaks[1].Duration / 2, true);
             seekAndAssertBreak("seek to break end", testBreaks[1].EndTime, false);
@@ -127,7 +110,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addShowBreakStep(double seconds)
         {
-            AddStep($"show '{seconds}s' break", () => breakOverlay.Breaks = breakTracker.Breaks = new List<BreakPeriod>
+            AddStep($"show '{seconds}s' break", () => breakOverlay.Breaks = new List<BreakPeriod>
             {
                 new BreakPeriod
                 {
@@ -139,12 +122,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void setClock(bool useManual)
         {
-            AddStep($"set {(useManual ? "manual" : "realtime")} clock", () => breakTracker.SwitchClock(useManual));
+            AddStep($"set {(useManual ? "manual" : "realtime")} clock", () => breakOverlay.SwitchClock(useManual));
         }
 
         private void loadBreaksStep(string breakDescription, IReadOnlyList<BreakPeriod> breaks)
         {
-            AddStep($"load {breakDescription}", () => breakOverlay.Breaks = breakTracker.Breaks = breaks);
+            AddStep($"load {breakDescription}", () => breakOverlay.Breaks = breaks);
             seekAndAssertBreak("seek back to 0", 0, false);
         }
 
@@ -168,18 +151,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void seekAndAssertBreak(string seekStepDescription, double time, bool shouldBeBreak)
         {
-            AddStep(seekStepDescription, () => breakTracker.ManualClockTime = time);
+            AddStep(seekStepDescription, () => breakOverlay.ManualClockTime = time);
             AddAssert($"is{(!shouldBeBreak ? " not" : string.Empty)} break time", () =>
             {
-                breakTracker.ProgressTime();
-                return breakTracker.IsBreakTime.Value == shouldBeBreak;
+                breakOverlay.ProgressTime();
+                return breakOverlay.IsBreakTime.Value == shouldBeBreak;
             });
         }
 
-        private class TestBreakTracker : BreakTracker
+        private class TestBreakOverlay : BreakOverlay
         {
-            public readonly FramedClock FramedManualClock;
-
+            private readonly FramedClock framedManualClock;
             private readonly ManualClock manualClock;
             private IFrameBasedClock originalClock;
 
@@ -191,19 +173,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                 set => manualClock.CurrentTime = value;
             }
 
-            public TestBreakTracker()
+            public TestBreakOverlay(bool letterboxing)
+                : base(letterboxing)
             {
-                FramedManualClock = new FramedClock(manualClock = new ManualClock());
+                framedManualClock = new FramedClock(manualClock = new ManualClock());
                 ProcessCustomClock = false;
             }
 
             public void ProgressTime()
             {
-                FramedManualClock.ProcessFrame();
+                framedManualClock.ProcessFrame();
                 Update();
             }
 
-            public void SwitchClock(bool setManual) => Clock = setManual ? FramedManualClock : originalClock;
+            public void SwitchClock(bool setManual) => Clock = setManual ? framedManualClock : originalClock;
 
             protected override void LoadComplete()
             {

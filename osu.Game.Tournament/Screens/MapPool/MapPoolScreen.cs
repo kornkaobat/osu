@@ -50,11 +50,11 @@ namespace osu.Game.Tournament.Screens.MapPool
                 new MatchHeader(),
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
-                    Y = 160,
+                    Y = 140,
                     Spacing = new Vector2(10, 10),
+                    Padding = new MarginPadding(25),
                     Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new ControlPanel
                 {
@@ -95,7 +95,6 @@ namespace osu.Game.Tournament.Screens.MapPool
                             Text = "Reset",
                             Action = reset
                         },
-                        new ControlPanel.Spacer(),
                     }
                 }
             };
@@ -212,14 +211,10 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             mapFlows.Clear();
 
-            int totalRows = 0;
-
             if (match.NewValue.Round.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
                 string currentMod = null;
-
-                int flowCount = 0;
 
                 foreach (var b in match.NewValue.Round.Value.Beatmaps)
                 {
@@ -234,15 +229,6 @@ namespace osu.Game.Tournament.Screens.MapPool
                         });
 
                         currentMod = b.Mods;
-
-                        totalRows++;
-                        flowCount = 0;
-                    }
-
-                    if (++flowCount > 2)
-                    {
-                        totalRows++;
-                        flowCount = 1;
                     }
 
                     currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
@@ -253,12 +239,6 @@ namespace osu.Game.Tournament.Screens.MapPool
                     });
                 }
             }
-
-            mapFlows.Padding = new MarginPadding(5)
-            {
-                // remove horizontal padding to increase flow width to 3 panels
-                Horizontal = totalRows > 9 ? 0 : 100
-            };
         }
     }
 }

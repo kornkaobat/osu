@@ -18,8 +18,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Storyboard / Video",
+                    LabelText = "Storyboards",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Video",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVideoBackground)
                 },
                 new SettingsCheckbox
                 {

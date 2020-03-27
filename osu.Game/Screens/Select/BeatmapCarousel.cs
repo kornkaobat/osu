@@ -333,7 +333,8 @@ namespace osu.Game.Screens.Select
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            select(set);
+            var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered.Value).ToList();
+            select(visibleBeatmaps[RNG.Next(visibleBeatmaps.Count)]);
             return true;
         }
 
@@ -750,17 +751,13 @@ namespace osu.Game.Screens.Select
 
             public CarouselRoot(BeatmapCarousel carousel)
             {
-                // root should always remain selected. if not, PerformSelection will not be called.
-                State.Value = CarouselItemState.Selected;
-                State.ValueChanged += state => State.Value = CarouselItemState.Selected;
-
                 this.carousel = carousel;
             }
 
             protected override void PerformSelection()
             {
-                if (LastSelected == null || LastSelected.Filtered.Value)
-                    carousel?.SelectNextRandom();
+                if (LastSelected == null)
+                    carousel.SelectNextRandom();
                 else
                     base.PerformSelection();
             }
