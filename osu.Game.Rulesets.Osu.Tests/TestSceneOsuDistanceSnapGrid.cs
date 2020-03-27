@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
+    public class TestSceneOsuDistanceSnapGrid : ManualInputManagerTestScene
     {
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);

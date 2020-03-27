@@ -12,7 +12,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneOsuHoverContainer : OsuManualInputManagerTestScene
+    public class TestSceneOsuHoverContainer : ManualInputManagerTestScene
     {
         private OsuHoverTestContainer hoverContainer;
         private Box colourContainer;

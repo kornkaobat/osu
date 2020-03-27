@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -36,8 +35,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         [Resolved]
         private TournamentMatchChatDisplay chat { get; set; }
 
-        private Box chroma;
-
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
         {
@@ -63,10 +60,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        chroma = new Box
+                        new Box
                         {
                             // chroma key area for stable gameplay
                             Name = "chroma",
+                            RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Height = 512,
@@ -95,12 +93,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
                             Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
-                        },
-                        new SettingsSlider<int>
-                        {
-                            LabelText = "Chroma Width",
-                            Bindable = LadderInfo.ChromaKeyWidth,
-                            KeyboardStep = 1,
                         }
                     }
                 }
@@ -108,8 +100,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             State.BindTo(ipc.State);
             State.BindValueChanged(stateChanged, true);
-
-            ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
             currentMatch.BindValueChanged(m =>
             {

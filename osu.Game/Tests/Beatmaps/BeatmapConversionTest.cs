@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -205,6 +206,8 @@ namespace osu.Game.Tests.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
 
             protected override Texture GetBackground() => throw new NotImplementedException();
+
+            protected override VideoSprite GetVideo() => throw new NotImplementedException();
 
             protected override Track GetTrack() => throw new NotImplementedException();
 

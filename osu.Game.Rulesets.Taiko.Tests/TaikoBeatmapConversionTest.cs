@@ -27,8 +27,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = hitObject.StartTime,
                 EndTime = hitObject.GetEndTime(),
-                IsRim = (hitObject as Hit)?.Type == HitType.Rim,
-                IsCentre = (hitObject as Hit)?.Type == HitType.Centre,
+                IsRim = hitObject is RimHit,
+                IsCentre = hitObject is CentreHit,
                 IsDrumRoll = hitObject is DrumRoll,
                 IsSwell = hitObject is Swell,
                 IsStrong = ((TaikoHitObject)hitObject).IsStrong

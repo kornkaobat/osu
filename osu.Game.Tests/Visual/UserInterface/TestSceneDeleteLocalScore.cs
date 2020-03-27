@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
+    public class TestSceneDeleteLocalScore : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

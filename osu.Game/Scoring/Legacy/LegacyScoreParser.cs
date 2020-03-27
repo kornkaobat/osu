@@ -19,7 +19,7 @@ using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
 {
-    public abstract class LegacyScoreDecoder
+    public abstract class LegacyScoreParser
     {
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
@@ -45,6 +45,9 @@ namespace osu.Game.Scoring.Legacy
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
 
+                currentBeatmap = workingBeatmap.Beatmap;
+                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
+
                 scoreInfo.User = new User { Username = sr.ReadString() };
 
                 // MD5Hash
@@ -63,10 +66,7 @@ namespace osu.Game.Scoring.Legacy
                 /* score.Perfect = */
                 sr.ReadBoolean();
 
-                scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
-
-                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
-                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
+                scoreInfo.Mods = currentRuleset.ConvertLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -264,7 +264,7 @@ namespace osu.Game.Scoring.Legacy
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 
-            convertible.FromLegacy(currentFrame, currentBeatmap, lastFrame);
+            convertible.ConvertFrom(currentFrame, currentBeatmap, lastFrame);
 
             var frame = (ReplayFrame)convertible;
             frame.Time = currentFrame.Time;

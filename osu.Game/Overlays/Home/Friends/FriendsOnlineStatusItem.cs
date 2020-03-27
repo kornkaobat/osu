@@ -5,11 +5,11 @@ using System;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Dashboard.Friends
+namespace osu.Game.Overlays.Home.Friends
 {
-    public class FriendsOnlineStatusItem : OverlayStreamItem<FriendStream>
+    public class FriendsOnlineStatusItem : OverlayStreamItem<FriendsBundle>
     {
-        public FriendsOnlineStatusItem(FriendStream value)
+        public FriendsOnlineStatusItem(FriendsBundle value)
             : base(value)
         {
         }
@@ -22,13 +22,13 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             switch (Value.Status)
             {
-                case OnlineStatus.All:
+                case FriendsOnlineStatus.All:
                     return Color4.White;
 
-                case OnlineStatus.Online:
+                case FriendsOnlineStatus.Online:
                     return colours.GreenLight;
 
-                case OnlineStatus.Offline:
+                case FriendsOnlineStatus.Offline:
                     return Color4.Black;
 
                 default:

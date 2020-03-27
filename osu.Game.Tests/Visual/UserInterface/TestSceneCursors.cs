@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneCursors : OsuManualInputManagerTestScene
+    public class TestSceneCursors : ManualInputManagerTestScene
     {
         private readonly MenuCursorContainer menuCursorContainer;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];

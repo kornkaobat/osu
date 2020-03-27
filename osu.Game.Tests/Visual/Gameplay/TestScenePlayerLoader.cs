@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLoader : OsuManualInputManagerTestScene
+    public class TestScenePlayerLoader : ManualInputManagerTestScene
     {
         private TestPlayerLoader loader;
         private TestPlayerLoaderContainer container;

@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osuTK;
 using osu.Framework.Bindables;
 
-namespace osu.Game.Overlays.Dashboard.Friends
+namespace osu.Game.Overlays.Home.Friends
 {
     public class UserListToolbar : CompositeDrawable
     {

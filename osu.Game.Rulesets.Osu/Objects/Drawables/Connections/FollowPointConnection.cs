@@ -88,6 +88,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private void refresh()
         {
+            ClearInternal();
+
             OsuHitObject osuStart = Start.HitObject;
             double startTime = osuStart.GetEndTime();
 
@@ -114,8 +116,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             double? firstTransformStartTime = null;
             double finalTransformEndTime = startTime;
 
-            int point = 0;
-
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
             {
                 float fraction = (float)d / distance;
@@ -126,18 +126,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 FollowPoint fp;
 
-                if (InternalChildren.Count > point)
+                AddInternal(fp = new FollowPoint
                 {
-                    fp = (FollowPoint)InternalChildren[point];
-                    fp.ClearTransforms();
-                }
-                else
-                    AddInternal(fp = new FollowPoint());
-
-                fp.Position = pointStartPosition;
-                fp.Rotation = rotation;
-                fp.Alpha = 0;
-                fp.Scale = new Vector2(1.5f * osuEnd.Scale);
+                    Position = pointStartPosition,
+                    Rotation = rotation,
+                    Alpha = 0,
+                    Scale = new Vector2(1.5f * osuEnd.Scale),
+                });
 
                 if (firstTransformStartTime == null)
                     firstTransformStartTime = fadeInTime;
@@ -151,13 +146,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                     finalTransformEndTime = fadeOutTime + osuEnd.TimeFadeIn;
                 }
-
-                point++;
             }
-
-            int excessPoints = InternalChildren.Count - point;
-            for (int i = 0; i < excessPoints; i++)
-                RemoveInternal(InternalChildren[^1]);
 
             // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
             LifetimeStart = firstTransformStartTime ?? startTime;
