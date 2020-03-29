@@ -2,18 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using osu.Game;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using static osu.Game.Beatmaps.BeatmapInfo;
-using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -24,8 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
+
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -44,9 +38,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     const double scale = 90;
 
                     var angleBonus = Math.Sqrt(
-                        Math.Max(osuPrevious.JumpDistance - scale, 0) *
-                        Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2) *
-                        Math.Max(osuCurrent.JumpDistance - scale, 0));
+                        Math.Max(osuPrevious.JumpDistance - scale, 0)
+                        * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
+                        * Math.Max(osuCurrent.JumpDistance - scale, 0));
                     result = 1.5 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
                 }
             }
